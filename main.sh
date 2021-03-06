@@ -20,7 +20,7 @@ freedisk="$(df /dev/sda --out=avail -k -m | tail -1)"
 homespace="$(( $freedisk / 1000 - 26))"
 
 # Disk space check
-if [ $freedisk -le "5000" ]
+if [ $freedisk -le "50000" ]
   then
     echo "Your disk space is less than 50GB, you require minimum of 50GB for this installation!"
     exit
