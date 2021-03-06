@@ -5,6 +5,10 @@ __contains () {
     echo "$1" | tr ' ' '\n' | grep -F -x -q "$2"
 }
 
+__command () {
+    arch-chroot /mnt -c "$1"
+}
+
 # Main information
 
 hostname=""
@@ -84,7 +88,6 @@ __start() {
 
     clear
 
-    exit
     umount -R /mnt
 
     clear
@@ -95,65 +98,54 @@ __start() {
 
 # Install extra packages
 __extra() {
-
-    arch-chroot /mnt
     
     pacman -S sudo
 
-    echo "%wheel ALL=(ALL) ALL" > /etc/sudoers
-    
-    exit
+    echo "%wheel ALL=(ALL) ALL" > /mnt/etc/sudoers
 
 }
 
 # Configure users
 __configureUsers() {
 
-    arch-chroot /mnt
-
-    passwd
-    ${rootpassword}
+    _command passwd
+    _command ${rootpassword}
     
-    useradd -m ${username}
-    passwd ${username}
-    ${userpassword}
-    usermod -aG wheel,video,audio,storage ${username}
-
-    exit
+    _command useradd -m ${username}
+    _command passwd ${username}
+    _command ${userpassword}
+    _command usermod -aG wheel,video,audio,storage ${username}
 
 }
 
 # Configure Local Time and Timezone
 __configureTime() {
 
-    arch-chroot /mnt
+    _command ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
 
-    ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
+    _command hwclock --systohc
 
-    hwclock --systohc
+    _command echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen
 
-    echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen
+    _command locale-gen
 
-    locale-gen
-
-    echo "LANG=${locale}.UTF-8" > /etc/locale.conf
+    _command echo "LANG=${locale}.UTF-8" > /etc/locale.conf
 
     splitLocale=(${IN//_/ })
 
-    echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf
+    _command echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf
 
-    echo "${hostname}" > /etc/hostname
+    _command echo "${hostname}" > /etc/hostname
 
-    echo "127.0.0.1 localhost" > /etc/hosts
-    echo "::1 localhost" > /etc/hosts
-    echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts
-
-    exit
+    _command echo "127.0.0.1 localhost" > /etc/hosts
+    _command echo "::1 localhost" > /etc/hosts
+    _command echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts
 
 }
 
 # Install linux and other packages
 __install() {
+    
     pacstrap /mnt base base-devel linux linux-firmware efibootmgr networkmanager grub
 
     genfstab -U /mnt >> /mnt/etc/fstab
@@ -162,6 +154,7 @@ __install() {
 
 # Mount disks and set file format type
 __mount() {
+
     mkfs.vfat -F32 /dev/sda1
 
     mkswap /dev/sda2
