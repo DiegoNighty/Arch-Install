@@ -7,13 +7,13 @@ __contains () {
 
 # Main information
 
-hostname=""
-username=""
-userpassword=""
-userpassword1=""
-rootpassword=""
-timezone=""
-locale=""
+hostname="default"
+username="default"
+userpassword="default"
+userpassword1="default"
+rootpassword="default"
+timezone="America/United_States"
+locale="en_US"
 
 freedisk=$(fdisk -l | awk '{print $3}' | grep -v "[A-Za-z.]" | paste -s)
 
@@ -83,11 +83,10 @@ __start() {
     __install
     __configureBase
     clear
-
+    
     echo "Your credentials: "
     echo "${username}:${userpassword}"
     sleep 10s
-    
     __extra
 
     clear
@@ -114,7 +113,7 @@ __extra() {
 # Configure users and time
 __configureBase() {
 
-    splitLocale=(${locale//_/ })
+    splitLocale=${locale//_/}
 
 arch-chroot /mnt /bin/bash <<EOF
     ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
@@ -135,15 +134,17 @@ arch-chroot /mnt /bin/bash <<EOF
     grub-install --efi-directory="/boot/efi" --target=x86_64-efi
     grub-mkconfig -o boot/grub/grub.cfg
 
-    passwd
-    ${rootpassword}
-    
+
+    echo "root:${rootpassword}" | chpasswd
+
     useradd -m ${username}
     passwd ${username}
     ${userpassword}
     usermod -aG wheel,video,audio,storage ${username}
 
 EOF
+
+sleep 20s
 }
 
 # Install linux and other packages
