@@ -208,13 +208,13 @@ __auto () {
     parted /dev/sda set 1 esp on
 
     #create SWAP partition
-    parted /dev/sda mkpart "swap partition" linux-swap 1GiB 5GiB
+    parted /dev/sda mkpart P2 linux-swap 1GiB 5GiB
 
     #create ROOT partition
-    parted /dev/sda mkpart "root partition" ext4 5GiB 25GiB
+    parted /dev/sda mkpart P3 ext4 5GiB 25GiB
 
     #create HOME partition
-    parted /dev/sda mkpart "home partition" ext4 25GiB 100%
+    parted /dev/sda mkpart P4 ext4 25GiB 100%
 
     fdisk -l
 
