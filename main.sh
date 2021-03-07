@@ -64,12 +64,12 @@ __start() {
 
     #review changes and ask if need to retype all changes
     echo "Information Summary: 
-    \n Hostname: ${hostname}
-    \n Username: ${username}
-    \n Password: ${userpassword}
-    \n Root: ${rootpassword}
-    \n Timezone: ${timezone}
-    \n Locale: ${locale}"
+    Hostname: ${hostname}
+    Username: ${username}
+    Password: ${userpassword}
+    Root: ${rootpassword}
+    Timezone: ${timezone}
+    Locale: ${locale}"
 
     echo "Do you want to change this data? [y/n]"
     read question1
@@ -178,44 +178,53 @@ __mount() {
 # Partition disk
 __disk() {
 
-    fdisk /dev/sda
+    clear
+    
+    echo "Do you want to do partitions manual? [y/n]"
+    echo "WARNING: you need your partition table format like this:"
 
-    #create EFI table
-    g
+    echo "dev/sda1 = EFI System or BIOS"
+    echo "dev/sda2 = Linux Swap"
+    echo "dev/sda3 = Root (Linux filesystem)"
+    echo "dev/sda4 = Home (linux home)"
+
+    read question2
+
+    if [ "$question2" = "y" ]; then 
+        cfdisk
+    else
+        __auto
+    fi
+
+}
+
+__auto () {
+
+    #create GPT table
+    parted /dev/sda mklabel gpt
 
     #create EFI partition
-    n
-    p
-    1
-    1G
-    t
-    1
-    1
+    parted /dev/sda mkpart "EFI System Partition" fat32 1MiB 1GiB
+    parted /dev/sda set 1 esp on
 
     #create SWAP partition
-    n
-    p
-    2
-    5G
-    t
-    2
-    t
-    82
+    parted /dev/sda mkpart "Swap Partition" linux-swap 1GiB 5GiB
 
     #create ROOT partition
-    n
-    p
-    3
-    20G
+    parted /dev/sda mkpart "Root Partition" ext4 5GiB 25GiB
 
     #create HOME partition
-    n
-    p
-    4
-    28
-    ${homespace}G
+    parted /dev/sda mkpart "Home Partition" ext4 25GiB 100%
 
-    w
+    fdisk -l
+
+    echo "You like to change this partitions?"
+    read question3
+
+    if [ "$question3" = "y" ]; then 
+        cfdisk
+    fi
+
 }
 
 __hostname() {
