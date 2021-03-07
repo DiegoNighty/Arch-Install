@@ -82,6 +82,12 @@ __start() {
     __mount
     __install
     __configureBase
+    clear
+
+    echo "Your credentials: "
+    echo "${username}:${userpassword}"
+    sleep 10s
+    
     __extra
 
     clear
@@ -91,6 +97,8 @@ __start() {
     clear
 
     echo "Installation successfully!, you can now reboot it"
+    echo "Your credentials: "
+    echo "${username}:${userpassword}"
 
 }
 
