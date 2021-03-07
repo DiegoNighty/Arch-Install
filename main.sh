@@ -31,7 +31,7 @@ __test () {
 }
 
 __test echo "HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA TEST"
-__test fdisk -l
+__test "fdisk -l"
 
 # Disk space check
 if [ $freedisk -le "50" ]
