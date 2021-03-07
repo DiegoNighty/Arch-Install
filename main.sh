@@ -5,11 +5,6 @@ __contains () {
     echo "$1" | tr ' ' '\n' | grep -F -x -q "$2"
 }
 
-__command () {
-    cat << EOF | chroot /mnt $1 
-EOF 
-}
-
 # Main information
 
 hostname=""
@@ -85,7 +80,7 @@ __start() {
 
     __disk
     __mount
-    __command ls
+    arch-chroot /mnt /bin/bash ls
     __install
     __configureTime
     __configureUsers
@@ -113,40 +108,40 @@ __extra() {
 # Configure users
 __configureUsers() {
 
-    __command 'grub-install --efi-directory="/boot/efi" --target=x86_64-efi'
-    __command 'grub-mkconfig -o boot/grub/grub.cfg'
+    arch-chroot /mnt /bin/bash 'grub-install --efi-directory="/boot/efi" --target=x86_64-efi'
+    arch-chroot /mnt /bin/bash 'grub-mkconfig -o boot/grub/grub.cfg'
 
-    __command passwd
-    __command ${rootpassword}
+    arch-chroot /mnt /bin/bash passwd
+    arch-chroot /mnt /bin/bash ${rootpassword}
     
-    __command 'useradd -m ${username}'
-    __command 'passwd ${username}'
-    __command ${userpassword}
-    __command 'usermod -aG wheel,video,audio,storage ${username}'
+    arch-chroot /mnt /bin/bash 'useradd -m ${username}'
+    arch-chroot /mnt /bin/bash 'passwd ${username}'
+    arch-chroot /mnt /bin/bash ${userpassword}
+    arch-chroot /mnt /bin/bash 'usermod -aG wheel,video,audio,storage ${username}'
 }
 
 # Configure Local Time and Timezone
 __configureTime() {
 
-    __command 'ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime'
+    arch-chroot /mnt /bin/bash 'ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime'
 
-    __command 'hwclock --systohc'
+    arch-chroot /mnt /bin/bash 'hwclock --systohc'
 
-    __command 'echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen'
+    arch-chroot /mnt /bin/bash 'echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen'
 
-    __command 'locale-gen'
+    arch-chroot /mnt /bin/bash 'locale-gen'
 
-    __command 'echo "LANG=${locale}.UTF-8" > /etc/locale.conf'
+    arch-chroot /mnt /bin/bash 'echo "LANG=${locale}.UTF-8" > /etc/locale.conf'
 
     splitLocale=(${locale//_/ })
 
-    __command 'echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf'
+    arch-chroot /mnt /bin/bash 'echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf'
 
-    __command 'echo "${hostname}" > /etc/hostname'
+    arch-chroot /mnt /bin/bash 'echo "${hostname}" > /etc/hostname'
 
-    __command 'echo "127.0.0.1 localhost" > /etc/hosts'
-    __command 'echo "::1 localhost" > /etc/hosts'
-    __command 'echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts'
+    arch-chroot /mnt /bin/bash 'echo "127.0.0.1 localhost" > /etc/hosts'
+    arch-chroot /mnt /bin/bash 'echo "::1 localhost" > /etc/hosts'
+    arch-chroot /mnt /bin/bash 'echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts'
 
 }
 
