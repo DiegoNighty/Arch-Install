@@ -6,7 +6,8 @@ __contains () {
 }
 
 __command () {
-    eval 'arch-chroot /mnt -c $1'
+    cat << EOF | chroot /mnt $1 
+EOF 
 }
 
 # Main information
@@ -84,6 +85,7 @@ __start() {
 
     __disk
     __mount
+    __command ls
     __install
     __configureTime
     __configureUsers
