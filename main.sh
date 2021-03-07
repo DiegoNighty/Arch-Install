@@ -204,17 +204,17 @@ __auto () {
     parted /dev/sda mklabel gpt
 
     #create EFI partition
-    parted /dev/sda mkpart "EFI System Partition" fat32 1MiB 1GiB
+    parted /dev/sda mkpart "EFI system partition" fat32 1MiB 1GiB
     parted /dev/sda set 1 esp on
 
     #create SWAP partition
-    parted /dev/sda mkpart "Swap Partition" linux-swap 1GiB 5GiB
+    parted /dev/sda mkpart "swap partition" linux-swap 1GiB 5GiB
 
     #create ROOT partition
-    parted /dev/sda mkpart "Root Partition" ext4 5GiB 25GiB
+    parted /dev/sda mkpart "root partition" ext4 5GiB 25GiB
 
     #create HOME partition
-    parted /dev/sda mkpart "Home Partition" ext4 25GiB 100%
+    parted /dev/sda mkpart "home partition" ext4 25GiB 100%
 
     fdisk -l
 
