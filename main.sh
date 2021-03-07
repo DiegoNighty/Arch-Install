@@ -6,7 +6,7 @@ __contains () {
 }
 
 __command () {
-    arch-chroot /mnt -c "$1"
+    eval arch-chroot /mnt -c "$1"
 }
 
 # Main information
@@ -24,6 +24,14 @@ freedisk=$(fdisk -l | awk '{print $3}' | grep -v "[A-Za-z.]" | paste -s)
 homespace="$(( $freedisk - 26))"
 
 echo ${freedisk}gb
+
+# REMOVE THIS
+__test () {
+    eval "$1"
+}
+
+__test echo "HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA TEST"
+__test fdisk -l
 
 # Disk space check
 if [ $freedisk -le "50" ]
@@ -220,7 +228,7 @@ __auto () {
 
     fdisk -l
 
-    echo "You like to change this partitions?"
+    echo "You like to change this partitions? [y/n]"
     read question3
 
     if [ "$question3" = "y" ]; then 
