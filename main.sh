@@ -6,7 +6,7 @@ __contains () {
 }
 
 __command () {
-    eval arch-chroot /mnt -c "$1"
+    eval 'arch-chroot /mnt -c $1'
 }
 
 # Main information
@@ -25,14 +25,6 @@ homespace="$(( $freedisk - 26))"
 
 echo ${freedisk}gb
 
-# REMOVE THIS
-__test () {
-    eval "$1"
-}
-
-__test echo "HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA TEST"
-__test "fdisk -l"
-
 # Disk space check
 if [ $freedisk -le "50" ]
   then
@@ -47,6 +39,7 @@ echo "Welcome to simple clean Arch linux installation!"
 __start() {
 
     #call host function
+    clear
     __hostname
     clear
 
@@ -121,37 +114,37 @@ __configureUsers() {
     __command 'grub-install --efi-directory="/boot/efi" --target=x86_64-efi'
     __command 'grub-mkconfig -o boot/grub/grub.cfg'
 
-    _command passwd
-    _command ${rootpassword}
+    __command passwd
+    __command ${rootpassword}
     
-    _command 'useradd -m ${username}'
-    _command 'passwd ${username}'
-    _command ${userpassword}
-    _command 'usermod -aG wheel,video,audio,storage ${username}'
+    __command 'useradd -m ${username}'
+    __command 'passwd ${username}'
+    __command ${userpassword}
+    __command 'usermod -aG wheel,video,audio,storage ${username}'
 }
 
 # Configure Local Time and Timezone
 __configureTime() {
 
-    _command 'ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime'
+    __command 'ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime'
 
-    _command 'hwclock --systohc'
+    __command 'hwclock --systohc'
 
-    _command 'echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen'
+    __command 'echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen'
 
-    _command 'locale-gen'
+    __command 'locale-gen'
 
-    _command 'echo "LANG=${locale}.UTF-8" > /etc/locale.conf'
+    __command 'echo "LANG=${locale}.UTF-8" > /etc/locale.conf'
 
     splitLocale=(${locale//_/ })
 
-    _command 'echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf'
+    __command 'echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf'
 
-    _command 'echo "${hostname}" > /etc/hostname'
+    __command 'echo "${hostname}" > /etc/hostname'
 
-    _command 'echo "127.0.0.1 localhost" > /etc/hosts'
-    _command 'echo "::1 localhost" > /etc/hosts'
-    _command 'echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts'
+    __command 'echo "127.0.0.1 localhost" > /etc/hosts'
+    __command 'echo "::1 localhost" > /etc/hosts'
+    __command 'echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts'
 
 }
 
