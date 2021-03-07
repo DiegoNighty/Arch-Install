@@ -80,10 +80,8 @@ __start() {
 
     __disk
     __mount
-    arch-chroot /mnt /bin/bash ls
     __install
-    __configureTime
-    __configureUsers
+    __configureBase
     __extra
 
     clear
@@ -105,44 +103,39 @@ __extra() {
 
 }
 
-# Configure users
-__configureUsers() {
-
-    arch-chroot /mnt /bin/bash 'grub-install --efi-directory="/boot/efi" --target=x86_64-efi'
-    arch-chroot /mnt /bin/bash 'grub-mkconfig -o boot/grub/grub.cfg'
-
-    arch-chroot /mnt /bin/bash passwd
-    arch-chroot /mnt /bin/bash ${rootpassword}
-    
-    arch-chroot /mnt /bin/bash 'useradd -m ${username}'
-    arch-chroot /mnt /bin/bash 'passwd ${username}'
-    arch-chroot /mnt /bin/bash ${userpassword}
-    arch-chroot /mnt /bin/bash 'usermod -aG wheel,video,audio,storage ${username}'
-}
-
-# Configure Local Time and Timezone
-__configureTime() {
-
-    arch-chroot /mnt /bin/bash 'ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime'
-
-    arch-chroot /mnt /bin/bash 'hwclock --systohc'
-
-    arch-chroot /mnt /bin/bash 'echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen'
-
-    arch-chroot /mnt /bin/bash 'locale-gen'
-
-    arch-chroot /mnt /bin/bash 'echo "LANG=${locale}.UTF-8" > /etc/locale.conf'
+# Configure users and time
+__configureBase() {
 
     splitLocale=(${locale//_/ })
 
-    arch-chroot /mnt /bin/bash 'echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf'
+arch-chroot /mnt /bin/bash <<EOF
+    ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
+    hwclock --systohc
+    
+    echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen
+    locale-gen
 
-    arch-chroot /mnt /bin/bash 'echo "${hostname}" > /etc/hostname'
+    echo "LANG=${locale}.UTF-8" > /etc/locale.conf
+    echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf
 
-    arch-chroot /mnt /bin/bash 'echo "127.0.0.1 localhost" > /etc/hosts'
-    arch-chroot /mnt /bin/bash 'echo "::1 localhost" > /etc/hosts'
-    arch-chroot /mnt /bin/bash 'echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts'
+    echo "${hostname}" > /etc/hostname
+    echo "127.0.0.1 localhost" > /etc/hosts
+    echo "::1 localhost" > /etc/hosts
+    echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts
 
+
+    grub-install --efi-directory="/boot/efi" --target=x86_64-efi
+    grub-mkconfig -o boot/grub/grub.cfg
+
+    passwd
+    ${rootpassword}
+    
+    useradd -m ${username}
+    passwd ${username}
+    ${userpassword}
+    usermod -aG wheel,video,audio,storage ${username}
+
+EOF
 }
 
 # Install linux and other packages
