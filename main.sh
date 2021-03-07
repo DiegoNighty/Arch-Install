@@ -110,38 +110,40 @@ __extra() {
 # Configure users
 __configureUsers() {
 
+    __command 'grub-install --efi-directory="/boot/efi" --target=x86_64-efi'
+    __command 'grub-mkconfig -o boot/grub/grub.cfg'
+
     _command passwd
     _command ${rootpassword}
     
-    _command useradd -m ${username}
-    _command passwd ${username}
+    _command 'useradd -m ${username}'
+    _command 'passwd ${username}'
     _command ${userpassword}
-    _command usermod -aG wheel,video,audio,storage ${username}
-
+    _command 'usermod -aG wheel,video,audio,storage ${username}'
 }
 
 # Configure Local Time and Timezone
 __configureTime() {
 
-    _command ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
+    _command 'ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime'
 
-    _command hwclock --systohc
+    _command 'hwclock --systohc'
 
-    _command echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen
+    _command 'echo "${locale}.UTF-8 UTF-8" > /etc/locale.gen'
 
-    _command locale-gen
+    _command 'locale-gen'
 
-    _command echo "LANG=${locale}.UTF-8" > /etc/locale.conf
+    _command 'echo "LANG=${locale}.UTF-8" > /etc/locale.conf'
 
     splitLocale=(${locale//_/ })
 
-    _command echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf
+    _command 'echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf'
 
-    _command echo "${hostname}" > /etc/hostname
+    _command 'echo "${hostname}" > /etc/hostname'
 
-    _command echo "127.0.0.1 localhost" > /etc/hosts
-    _command echo "::1 localhost" > /etc/hosts
-    _command echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts
+    _command 'echo "127.0.0.1 localhost" > /etc/hosts'
+    _command 'echo "::1 localhost" > /etc/hosts'
+    _command 'echo "127.0.1.1 ${hostname}.localdomain ${username}" > /etc/hosts'
 
 }
 
@@ -204,7 +206,7 @@ __auto () {
     parted /dev/sda mklabel gpt
 
     #create EFI partition
-    parted /dev/sda mkpart "EFI system partition" fat32 1MiB 1GiB
+    parted /dev/sda mkpart P1 ext4 1MiB 1GiB
     parted /dev/sda set 1 esp on
 
     #create SWAP partition
