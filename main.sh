@@ -143,6 +143,9 @@ arch-chroot /mnt /bin/bash <<EOF
     ${userpassword}
     ${userpassword}
     usermod -aG wheel,video,audio,storage ${username}
+    echo "GROUPS CONFIGURED"
+    echo "USER PASSWORD" ${userpassword}
+    echo "USER NAME" ${username}
 
 EOF
 
