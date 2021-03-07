@@ -19,12 +19,14 @@ rootpassword=""
 timezone=""
 locale=""
 
-freedisk="$(df /dev/sda --out=avail -k -m | tail -1)"
+freedisk=$(fdisk -l | awk '{print $3}' | grep -v "[A-Za-z.]" | paste -s)
 
-homespace="$(( $freedisk / 1000 - 26))"
+homespace="$(( $freedisk - 26))"
+
+echo ${freedisk}gb
 
 # Disk space check
-if [ $freedisk -le "50000" ]
+if [ $freedisk -le "50" ]
   then
     echo "Your disk space is less than 50GB, you require minimum of 50GB for this installation!"
     exit
@@ -131,7 +133,7 @@ __configureTime() {
 
     _command echo "LANG=${locale}.UTF-8" > /etc/locale.conf
 
-    splitLocale=(${IN//_/ })
+    splitLocale=(${locale//_/ })
 
     _command echo "KEYMAP=${splitLocale[0]}" > /etc/locale.conf
 
