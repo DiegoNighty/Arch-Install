@@ -134,18 +134,18 @@ arch-chroot /mnt /bin/bash <<EOF
     grub-install --efi-directory="/boot/efi" --target=x86_64-efi
     grub-mkconfig -o boot/grub/grub.cfg
 
+    passwd
+    diego
+    diego
 
-    echo "root:${rootpassword}" | chpasswd
-    ${rootpassword}
-
-    useradd -m ${username}
-    passwd ${username}
-    ${userpassword}
-    ${userpassword}
-    usermod -aG wheel,video,audio,storage ${username}
+    useradd -m diego
+    passwd diego
+    diego
+    diego
+    usermod -aG wheel,video,audio,storage diego
     echo "GROUPS CONFIGURED"
-    echo "USER PASSWORD" ${userpassword}
-    echo "USER NAME" ${username}
+    echo "USER PASSWORD" diego
+    echo "USER NAME" diego
 
 EOF
 
