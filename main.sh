@@ -136,6 +136,7 @@ arch-chroot /mnt /bin/bash <<EOF
 
 
     echo "root:${rootpassword}" | chpasswd
+    ${rootpassword}
 
     useradd -m ${username}
     passwd ${username}
