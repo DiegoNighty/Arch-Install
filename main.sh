@@ -140,6 +140,7 @@ arch-chroot /mnt /bin/bash <<EOF
     useradd -m ${username}
     passwd ${username}
     ${userpassword}
+    ${userpassword}
     usermod -aG wheel,video,audio,storage ${username}
 
 EOF
